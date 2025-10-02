@@ -1,0 +1,29 @@
+{
+  "name": "libre-subtitles-stremio",
+  "version": "1.0.0",
+  "description": "Stremio add-on for scraping subtitles from libre-subs.fifthwit.net",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "echo \"No tests specified yet\" && exit 0"
+  },
+  "keywords": [
+    "stremio",
+    "addon",
+    "subtitles",
+    "libre-subs"
+  ],
+  "author": "",
+  "license": "MPL-2.0",
+  "dependencies": {
+    "stremio-addon-sdk": "^1.6.10",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
