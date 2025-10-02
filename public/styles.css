@@ -355,3 +355,9 @@ code {
 .inline-toggle input:disabled + span {
   opacity: 0.45;
 }
+
+.footer a[data-disabled="true"] {
+  pointer-events: none;
+  opacity: 0.6;
+  cursor: default;
+}

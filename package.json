@@ -1,6 +1,6 @@
 {
   "name": "libre-subtitles-stremio",
-  "version": "1.0.0",
+  "version": "1.1.2",
   "description": "Stremio add-on for scraping subtitles from libre-subs.fifthwit.net",
   "main": "src/index.js",
   "scripts": {

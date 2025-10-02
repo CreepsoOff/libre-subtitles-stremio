@@ -74,8 +74,47 @@ const copyHttpBtn = document.querySelector('#copyHttp');
 const formatContainer = document.querySelector('#formatOptions');
 const sourceContainer = document.querySelector('#sourceOptions');
 const uiVersionTag = document.querySelector('#uiVersion');
+const addonVersionTag = document.querySelector('#addonVersion');
+const addonCommitLink = document.querySelector('#addonCommit');
 
 uiVersionTag.textContent = UI_VERSION;
+async function loadVersionInfo() {
+  try {
+    const resp = await fetch('/version.json', { cache: 'no-store' });
+    if (!resp.ok) throw new Error('bad status');
+    const info = await resp.json();
+    if (info.version) {
+      addonVersionTag.textContent = info.version;
+    }
+    if (info.commit && info.commit.short) {
+      addonCommitLink.textContent = info.commit.short;
+      if (info.commit.url) {
+        addonCommitLink.href = info.commit.url;
+        addonCommitLink.target = '_blank';
+      }
+      addonCommitLink.removeAttribute('data-disabled');
+    } else {
+      addonCommitLink.textContent = '--';
+      addonCommitLink.href = '#';
+      addonCommitLink.setAttribute('data-disabled', 'true');
+    }
+  } catch (err) {
+    try {
+      const resp = await fetch('/version.txt', { cache: 'no-store' });
+      if (!resp.ok) throw new Error('bad status');
+      const text = (await resp.text()).trim();
+      if (text) {
+        addonVersionTag.textContent = text;
+      }
+    } catch (_) {
+      addonVersionTag.textContent = 'unknown';
+    } finally {
+      addonCommitLink.textContent = '--';
+      addonCommitLink.href = '#';
+      addonCommitLink.setAttribute('data-disabled', 'true');
+    }
+  }
+}
 
 function renderLanguageOptions() {
   LANGUAGES.sort((a, b) => a.label.localeCompare(b.label, 'en'));
@@ -243,3 +282,4 @@ renderChips(sourceContainer, SOURCE_OPTIONS, state.sources);
 bindToggles();
 updateLanguageSummary();
 updateInstallData();
+loadVersionInfo();

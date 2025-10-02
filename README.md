@@ -104,6 +104,9 @@ The handler understands the following shape (fields are optional):
 
 ## Development Notes
 
+- `version.txt` holds the add-on release number (e.g. `1.1.2`). The UI footer fetches this file so updating the version only requires editing it before you deploy.
+
+
 - `src/services/libre-subs-scraper.js` handles HTTP requests against Libre Subs and normalises the payload (language codes, URLs, metadata).
 - `src/handlers/subtitles.js` parses the Stremio config payload and applies all filters before responding.
 - The code logs incoming requests and gracefully returns an empty list on failures.
@@ -144,6 +147,24 @@ Libre Subs is a community service with no official rate limits, but please:
 - Cache responses when deploying publicly
 - Avoid aggressive polling
 - Honour any future terms of service updates
+
+
+## Release workflow
+
+1. **Bump the version**
+   ```bash
+   npm version 1.1.2
+   ```
+   This updates `package.json`, `package-lock.json`, creates a commit, and tags `v1.1.2`.
+2. **Push**
+   ```bash
+   git push origin HEAD --tags
+   ```
+3. **Deploy**
+   - `docker-compose up -d --build` (or your CI pipeline).
+   - The server reads the version from `package.json` and the commit hash from Git metadata/env, so the footer will automatically show `UI v… · Add-on v… (hash)` for the deployed commit.
+
+You can override values with environment variables (`ADDON_VERSION`, `ADDON_COMMIT`, `ADDON_COMMIT_SHORT`, `ADDON_COMMIT_URL`) if your deployment pipeline provides them. Otherwise the Node process falls back to the Git metadata bundled in the image.
 
 ## Resources
 
