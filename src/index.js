@@ -14,10 +14,21 @@ const versionJsonFile = path.join(__dirname, '..', 'version.json');
 const REPO_COMMIT_URL = process.env.ADDON_COMMIT_URL_BASE || 'https://github.com/CreepsoOff/libre-subtitles-stremio/commit/';
 
 app.get('/', (_, res) => {
+  res.setHeader('Cache-Control', 'no-store');
   res.sendFile(path.join(staticDir, 'index.html'));
 });
 
-app.use(express.static(staticDir));
+app.get('/app.js', (_, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.sendFile(path.join(staticDir, 'app.js'));
+});
+
+app.get('/styles.css', (_, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.sendFile(path.join(staticDir, 'styles.css'));
+});
+
+app.use(express.static(staticDir, { maxAge: 0, etag: false }));
 function getGitInfo() {
   try {
     const full = execSync('git rev-parse HEAD', { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim();
@@ -42,7 +53,11 @@ function loadVersionInfo(callback) {
 
   const enhance = (base) => {
     const info = base || {};
-    if (!info.version) info.version = envVersion;
+    if (envVersion) {
+      info.version = envVersion;
+    } else if (!info.version) {
+      info.version = pkg.version;
+    }
 
     const commit = info.commit ? { ...info.commit } : {};
     if (envCommitFull && !commit.full) commit.full = envCommitFull;
