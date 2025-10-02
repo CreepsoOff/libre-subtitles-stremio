@@ -9,7 +9,7 @@
  * 2. Bumps package.json / package-lock.json without creating a commit or tag.
  * 3. Mirrors the version into version.txt and version.json.
  * 4. Commits all release artefacts with a standard message.
- * 5. Creates or updates the annotated git tag for the version.
+ * 5. Creates or updates the annotated git tag for the version with a compare link.
  *
  * The script prints out the next commands (git push & docker compose).
  */
@@ -54,7 +54,8 @@ function updateVersionFiles(version) {
 `);
   fs.writeFileSync(
     VERSION_JSON,
-    JSON.stringify({ version }, null, 2) + ''
+    JSON.stringify({ version }, null, 2) + '
+'
   );
 }
 
@@ -68,13 +69,59 @@ function addReleaseFilesToGit() {
   run(`git add ${files.join(' ')}`);
 }
 
-function createTag(version) {
+function getPreviousTag() {
+  try {
+    return runCapture('git describe --tags --abbrev=0 HEAD^');
+  } catch (err) {
+    try {
+      return runCapture('git describe --tags --abbrev=0');
+    } catch (_) {
+      return null;
+    }
+  }
+}
+
+function getRemoteHttpUrl() {
+  try {
+    let remote = runCapture('git config --get remote.origin.url');
+    if (!remote) return null;
+    if (remote.startsWith('git@')) {
+      const match = remote.match(/git@([^:]+):(.+)(\.git)?$/);
+      if (match) {
+        return `https://${match[1]}/${match[2].replace(/\.git$/, '')}`;
+      }
+    }
+    if (remote.startsWith('http://') || remote.startsWith('https://')) {
+      return remote.replace(/\.git$/, '');
+    }
+  } catch (_) {
+    // ignore
+  }
+  return null;
+}
+
+function buildTagMessage(version, previousTag) {
+  let message = `Release ${version}`;
+  const baseUrl = getRemoteHttpUrl();
+  if (baseUrl && previousTag) {
+    message += `
+
+Full changelog: ${baseUrl}/compare/${previousTag}...v${version}`;
+  } else if (baseUrl) {
+    message += `
+
+Full changelog: ${baseUrl}/releases/tag/v${version}`;
+  }
+  return message;
+}
+
+function createTag(version, previousTag) {
   const existing = runCapture(`git tag -l v${version}`);
   if (existing) {
-    // Overwrite tag if it already exists (e.g., rerun).
     run(`git tag -d v${version}`);
   }
-  run(`git tag -a v${version} -m "Release ${version}"`);
+  const message = buildTagMessage(version, previousTag);
+  run(`git tag -a v${version} -m ${JSON.stringify(message)}`);
 }
 
 (function main() {
@@ -85,18 +132,25 @@ function createTag(version) {
   updateVersionFiles(nextVersion);
 
   addReleaseFilesToGit();
-  run(`git commit -m "chore(release): ${nextVersion}"`);
-  createTag(nextVersion);
+  run(`git commit -m ${JSON.stringify(`chore(release): ${nextVersion}`)}`);
+
+  const previousTag = getPreviousTag();
+  createTag(nextVersion, previousTag);
 
   const fullCommit = runCapture('git rev-parse HEAD');
   const shortCommit = runCapture('git rev-parse --short HEAD');
 
-  console.log('Release ready!');
+  console.log('
+Release ready!');
   console.log(`  version : ${nextVersion}`);
   console.log(`  commit  : ${fullCommit} (${shortCommit})`);
   console.log(`  tag     : v${nextVersion}`);
+  if (previousTag) {
+    console.log(`  previous: ${previousTag}`);
+  }
 
-  console.log('Next steps:');
+  console.log('
+Next steps:');
   console.log('  git push origin HEAD --tags');
   console.log('  docker compose up -d --build');
 })();
