@@ -42,52 +42,76 @@ function normalizeConfig(config) {
   };
 }
 
-function applyPreferences(subtitles, preferences) {
+function applyPreferences(subtitles, preferences, maxResults = 5) {
   if (!Array.isArray(subtitles) || !subtitles.length) {
     return [];
   }
 
-  let results = [...subtitles];
+  const normalizedLangs = preferences.languages.map((lang) => lang.toLowerCase());
+  const enforceStrict = preferences.strictLanguages && normalizedLangs.length;
 
-  if (preferences.formats.length) {
-    results = results.filter((item) => {
-      return item.format ? preferences.formats.includes(item.format) : false;
-    });
-  }
+  const languageMatches = normalizedLangs.length
+    ? subtitles.filter((item) => normalizedLangs.includes((item.lang || '').toLowerCase()))
+    : [...subtitles];
 
-  if (preferences.sources.length) {
-    results = results.filter((item) => {
-      return item.source ? preferences.sources.includes(item.source) : false;
-    });
-  }
+  let ordered = [...languageMatches];
 
   if (!preferences.includeHearingImpaired) {
-    results = results.filter((item) => !item.isHearingImpaired);
-  }
-
-  if (preferences.languages.length) {
-    const preferred = results.filter((item) => preferences.languages.includes((item.lang || '').toLowerCase()));
-    if (preferences.strictLanguages) {
-      results = preferred;
-    } else if (preferred.length) {
-      const others = results.filter((item) => !preferences.languages.includes((item.lang || '').toLowerCase()));
-      results = preferred.concat(others);
+    const nonHearing = ordered.filter((item) => !item.isHearingImpaired);
+    if (nonHearing.length) {
+      ordered = nonHearing;
+      if (nonHearing.length < maxResults) {
+        const hearingExtras = languageMatches.filter((item) => item.isHearingImpaired && !nonHearing.includes(item));
+        ordered = ordered.concat(hearingExtras);
+      }
+    } else if (!enforceStrict) {
+      ordered = languageMatches;
+    } else {
+      ordered = nonHearing;
     }
   }
 
+  if (preferences.formats.length) {
+    const formatSet = new Set(preferences.formats.map((fmt) => fmt.toLowerCase()));
+    const filtered = ordered.filter((item) => item.format && formatSet.has(item.format));
+    if (filtered.length || !enforceStrict) {
+      ordered = filtered.length ? filtered : ordered;
+    } else {
+      ordered = filtered;
+    }
+  }
+
+  if (preferences.sources.length) {
+    const sourceSet = new Set(preferences.sources.map((src) => src.toLowerCase()));
+    const filtered = ordered.filter((item) => item.source && sourceSet.has(item.source));
+    if (filtered.length || !enforceStrict) {
+      ordered = filtered.length ? filtered : ordered;
+    } else {
+      ordered = filtered;
+    }
+  }
+
+  if (!ordered.length && normalizedLangs.length) {
+    ordered = languageMatches;
+  }
+
   if (preferences.preferHearingImpaired && preferences.includeHearingImpaired) {
-    const hearing = results.filter((item) => item.isHearingImpaired);
-    const regular = results.filter((item) => !item.isHearingImpaired);
-    results = hearing.concat(regular);
+    const hearing = ordered.filter((item) => item.isHearingImpaired);
+    const regular = ordered.filter((item) => !item.isHearingImpaired);
+    ordered = hearing.concat(regular);
   }
 
   const seen = new Set();
-  return results.filter((item) => {
-    if (!item || !item.id || !item.url) return false;
-    if (seen.has(item.id)) return false;
+  const deduped = [];
+  for (const item of ordered) {
+    if (!item || !item.id || !item.url) continue;
+    if (seen.has(item.id)) continue;
     seen.add(item.id);
-    return true;
-  });
+    deduped.push(item);
+  }
+
+  const finalList = maxResults ? deduped.slice(0, maxResults) : deduped;
+  return finalList;
 }
 
 /**
@@ -114,13 +138,25 @@ async function handleSubtitles(args) {
       type,
       id,
       season: extra.season,
-      episode: extra.episode
+      episode: extra.episode,
+      preferences
     });
 
-    const filtered = applyPreferences(subtitles, preferences);
+    let filtered = applyPreferences(subtitles, preferences, 5);
+    if (!filtered.length && preferences.strictLanguages) {
+      filtered = applyPreferences(subtitles, { ...preferences, strictLanguages: false }, 5);
+    }
+
+    console.log(`Returning ${filtered.length} subtitle(s) for ${type} ${id}`);
 
     return {
-      subtitles: filtered.map(({ id: subtitleId, url, lang }) => ({ id: subtitleId, url, lang }))
+      subtitles: filtered.map(({ id: subtitleId, url, lang, format, source }) => ({
+        id: subtitleId,
+        url,
+        lang,
+        ...(format ? { format } : {}),
+        ...(source ? { source } : {})
+      }))
     };
   } catch (error) {
     console.error('Error fetching subtitles:', error.message);

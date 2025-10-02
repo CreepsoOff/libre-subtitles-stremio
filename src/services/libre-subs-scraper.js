@@ -170,13 +170,23 @@ function parseSeasonEpisode(rawId, season, episode) {
   return { season: resultSeason, episode: resultEpisode };
 }
 
-function buildSearchParams({ type, id, season, episode }) {
+function buildSearchParams({ type, id, season, episode, preferences = {} }) {
   const baseId = extractBaseId(id);
   if (!baseId) {
     return null;
   }
 
   const params = { id: baseId };
+
+  const prefLangs = Array.isArray(preferences.languages) ? preferences.languages.filter(Boolean) : [];
+  if (prefLangs.length === 1) {
+    params.language = prefLangs[0];
+  }
+
+  const prefFormats = Array.isArray(preferences.formats) ? preferences.formats.filter(Boolean) : [];
+  if (prefFormats.length === 1) {
+    params.format = prefFormats[0];
+  }
 
   if (type === 'series') {
     const parsed = parseSeasonEpisode(id, season, episode);
@@ -224,8 +234,8 @@ function createSubtitleEntry(item) {
  * @param {string|number} [params.episode] - Episode number for series
  * @returns {Promise<Array>} Array of subtitle objects
  */
-async function scrapeSubtitles({ type, id, season, episode }) {
-  const searchParams = buildSearchParams({ type, id, season, episode });
+async function scrapeSubtitles({ type, id, season, episode, preferences = {} }) {
+  const searchParams = buildSearchParams({ type, id, season, episode, preferences });
 
   if (!searchParams) {
     console.warn('Unable to build search parameters for subtitle request', { type, id, season, episode });
