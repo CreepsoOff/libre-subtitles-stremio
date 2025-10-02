@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Libre Subtitles · Stremio Add-on</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <div class="hero__badge">Libre Subs powered</div>
+        <h1 class="hero__title">Libre Subtitles for Stremio</h1>
+        <p class="hero__subtitle">
+          Install the add-on that aggregates subtitles from <strong>libre-subs.fifthwit.net</strong> and shape the
+          languages, formats, and sources you want to expose inside Stremio.
+        </p>
+      </header>
+
+      <section class="card installation">
+        <h2>⚙️ Quick install</h2>
+        <ol>
+          <li>Start the local server with <code>npm start</code> (default port: 7000).</li>
+          <li>Open Stremio → Addons → Community Addons.</li>
+          <li>Generate your personalised link below, then click “Install in Stremio”.</li>
+        </ol>
+        <div class="install-actions">
+          <a id="installLink" class="btn btn--primary" href="#">Install in Stremio</a>
+          <button id="copyHttp" class="btn btn--ghost" type="button">Copy HTTP URL</button>
+        </div>
+        <label class="install-url">
+          <span>Generated URL</span>
+          <input id="installUrl" type="text" readonly />
+        </label>
+        <p class="install-hint">Share this HTTP link to install the add-on on another device.</p>
+      </section>
+
+      <section class="card preferences">
+        <h2>🎯 Subtitle preferences</h2>
+        <form id="preferencesForm">
+          <div class="field">
+            <div class="field__label">Preferred languages</div>
+            <details class="dropdown" id="languageDropdown">
+              <summary id="languageSummary">All languages (recommended)</summary>
+              <div class="dropdown__panel" id="languageOptions"></div>
+            </details>
+            <label class="inline-toggle">
+              <input type="checkbox" id="strictLanguages" />
+              <span>Keep only the selected languages</span>
+            </label>
+          </div>
+
+          <div class="field field--cluster">
+            <div class="field__label">Accepted formats</div>
+            <div class="chip-group" id="formatOptions"></div>
+            <p class="field__hint">Leave empty to accept every format exposed by Libre Subs.</p>
+          </div>
+
+          <div class="field field--cluster">
+            <div class="field__label">Sources</div>
+            <div class="chip-group" id="sourceOptions"></div>
+            <p class="field__hint">Toggle only the subtitle providers you want to surface.</p>
+          </div>
+
+          <div class="field field--stacked">
+            <label class="inline-toggle">
+              <input type="checkbox" id="includeHearing" checked />
+              <span>Include hearing-impaired subtitles</span>
+            </label>
+            <label class="inline-toggle">
+              <input type="checkbox" id="preferHearing" />
+              <span>Prioritise hearing-impaired tracks when available</span>
+            </label>
+          </div>
+
+          <div class="field">
+            <div class="field__label">Configuration preview</div>
+            <pre id="configPreview" class="config-preview"></pre>
+          </div>
+        </form>
+      </section>
+
+      <footer class="footer">
+        <p>
+          Libre Subs is a free community project. Be mindful of their infrastructure: avoid unnecessary requests and
+          monitor their terms of use.
+        </p>
+        <p class="footer__meta">UI version <span id="uiVersion">1.0.0</span></p>
+      </footer>
+    </main>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

@@ -1,73 +1,54 @@
-# Quick Start Guide
+# Guide de démarrage
 
 ## Installation rapide
 
 ```bash
-# 1. Installer les dépendances
 npm install
-
-# 2. Démarrer le serveur
 npm start
 ```
 
-Le serveur démarre sur http://localhost:7000
+Le serveur écoute par défaut sur [http://localhost:7000](http://localhost:7000).
 
-## Tester l'add-on
+## Interface web
 
-### Manifest
+- Ouvrez `http://localhost:7000/` pour accéder au configurateur.
+- Sélectionnez vos langues, formats et sources préférées.
+- Utilisez « Installer dans Stremio » ou copiez l’URL HTTP générée.
+
+## Tests rapides
+
 ```bash
-curl http://localhost:7000/manifest.json
+# Manifest
+dev@pc$ curl http://localhost:7000/manifest.json
+
+# Sous-titres film
+dev@pc$ curl http://localhost:7000/subtitles/movie/tt0111161.json
+
+# Sous-titres série (ID:Saison:Episode)
+dev@pc$ curl "http://localhost:7000/subtitles/series/tt0903747:1:1.json"
 ```
 
-### Sous-titres pour un film
-```bash
-curl http://localhost:7000/subtitles/movie/tt0111161.json
-```
+## Installation dans Stremio
 
-### Sous-titres pour une série
-```bash
-curl http://localhost:7000/subtitles/series/tt0903747:1:1.json
-```
-
-## Installer dans Stremio
-
-1. Ouvrir Stremio
-2. Aller dans "Addons"
-3. Cliquer sur "Community Addons"
-4. Coller l'URL : `http://localhost:7000/manifest.json`
-5. Cliquer sur "Install"
+1. Démarrez l’add-on localement.
+2. Générez un lien via l’interface web.
+3. Dans Stremio : Addons → Community Addons → collez l’URL.
 
 ## Développement
 
 ```bash
-# Mode développement avec rechargement automatique
-npm run dev
+npm run dev   # nodemon + rechargement
 ```
 
-## Fichier principal à compléter
+Le scraping est déjà implémenté (`src/services/libre-subs-scraper.js`). Vous pouvez adapter les filtres dans `src/handlers/subtitles.js` et personnaliser l’UI dans `public/`.
 
-**src/services/libre-subs-scraper.js**
+## Endpoints disponibles
 
-C'est le seul fichier qui nécessite une implémentation complète. Voir INSTRUCTIONS_FR.md pour plus de détails.
+- `GET /` — Interface de configuration
+- `GET /manifest.json` — Manifeste Stremio
+- `GET /subtitles/:type/:id.json` — Flux de sous-titres (params `season`, `episode`)
+- `GET /health` — Sonde de santé
 
-## Structure des endpoints
+## Besoin d’aide ?
 
-### GET /manifest.json
-Retourne le manifeste de l'add-on
-
-### GET /subtitles/:type/:id.json
-- `:type` = "movie" ou "series"
-- `:id` = ID IMDB (ex: "tt0111161")
-- Pour les séries : `:id` = "tt0903747:1:1" (ID:saison:épisode)
-
-## Prochaines étapes
-
-1. ✅ Projet configuré
-2. ⚠️ Analyser libre-subs.fifthwit.net
-3. ⚠️ Implémenter scrapeSubtitles()
-4. ⚠️ Tester avec vrais contenus
-5. ⚠️ Déployer
-
-## Aide
-
-Voir README.md et INSTRUCTIONS_FR.md pour la documentation complète.
+Consultez `README.md` pour la documentation détaillée ainsi que `INSTRUCTIONS_FR.md` pour les notes historiques.
