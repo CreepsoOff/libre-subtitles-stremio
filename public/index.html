@@ -15,17 +15,17 @@
         <div class="hero__badge">Libre Subs powered</div>
         <h1 class="hero__title">Libre Subtitles for Stremio</h1>
         <p class="hero__subtitle">
-          Install the add-on that aggregates subtitles from <strong>libre-subs.fifthwit.net</strong> and shape the
-          languages, formats, and sources you want to expose inside Stremio.
+          Enjoy a one-click way to install high-quality subtitles from <strong>libre-subs.fifthwit.net</strong> in your Stremio app.
+          Pick your favourite languages and sources, we take care of the rest.
         </p>
       </header>
 
       <section class="card installation">
         <h2>⚙️ Quick install</h2>
         <ol>
-          <li>Start the local server with <code>npm start</code> (default port: 7000).</li>
+          <li>Keep this page open while the add-on is running.</li>
           <li>Open Stremio → Addons → Community Addons.</li>
-          <li>Generate your personalised link below, then click “Install in Stremio”.</li>
+          <li>Use the button below to install or share the generated link.</li>
         </ol>
         <div class="install-actions">
           <a id="installLink" class="btn btn--primary" href="#">Install in Stremio</a>
@@ -35,7 +35,7 @@
           <span>Generated URL</span>
           <input id="installUrl" type="text" readonly />
         </label>
-        <p class="install-hint">Share this HTTP link to install the add-on on another device.</p>
+        <p class="install-hint">Tip: share this HTTP link to install the add-on on another device.</p>
       </section>
 
       <section class="card preferences">
@@ -49,44 +49,44 @@
             </details>
             <label class="inline-toggle">
               <input type="checkbox" id="strictLanguages" />
-              <span>Keep only the selected languages</span>
+              <span>Show only the languages you choose</span>
             </label>
           </div>
 
           <div class="field field--cluster">
             <div class="field__label">Accepted formats</div>
             <div class="chip-group" id="formatOptions"></div>
-            <p class="field__hint">Leave empty to accept every format exposed by Libre Subs.</p>
+            <p class="field__hint">Leave empty to keep every format that Libre Subs provides.</p>
           </div>
 
           <div class="field field--cluster">
             <div class="field__label">Sources</div>
             <div class="chip-group" id="sourceOptions"></div>
-            <p class="field__hint">Toggle only the subtitle providers you want to surface.</p>
+            <p class="field__hint">Keep everything enabled for maximum coverage or pick your favourites.</p>
           </div>
 
           <div class="field field--stacked">
             <label class="inline-toggle">
               <input type="checkbox" id="includeHearing" checked />
-              <span>Include hearing-impaired subtitles</span>
+              <span>Include subtitles for the hearing impaired</span>
             </label>
             <label class="inline-toggle">
               <input type="checkbox" id="preferHearing" />
-              <span>Prioritise hearing-impaired tracks when available</span>
+              <span>Show hearing-impaired subtitles first when available</span>
             </label>
           </div>
 
           <div class="field">
-            <div class="field__label">Configuration preview</div>
+            <div class="field__label">Advanced preview</div>
             <pre id="configPreview" class="config-preview"></pre>
+            <p class="field__hint">Share this if someone else wants the exact same setup.</p>
           </div>
         </form>
       </section>
 
       <footer class="footer">
         <p>
-          Libre Subs is a free community project. Be mindful of their infrastructure: avoid unnecessary requests and
-          monitor their terms of use.
+          Libre Subs is a free community project. Please support them if the service makes your streaming easier.
         </p>
         <p class="footer__meta">UI version <span id="uiVersion">1.0.0</span></p>
       </footer>

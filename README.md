@@ -154,3 +154,24 @@ Libre Subs is a community service with no official rate limits, but please:
 ---
 
 Libre Subtitles Stremio Addon is released under the [Mozilla Public License 2.0](LICENSE).
+
+
+## Production Deployment (sub.creepso.com)
+
+1. Set the DNS A record for `sub.creepso.com` to point to your VPS.
+2. Copy `.env.example` to `.env` if you want to override the default port.
+3. Export an email for Let's Encrypt before starting Traefik: `export TRAEFIK_ACME_EMAIL=you@example.com`.
+4. Run `docker-compose up -d --build`. Traefik obtains certificates automatically and routes traffic to the add-on container.
+5. Visit `https://sub.creepso.com/` to access the configurator, then install the add-on in Stremio using the generated link.
+
+The compose stack installs Traefik (reverse proxy with TLS) and the add-on container. Adjust `docker-compose.yml` to match your infrastructure if you already run Traefik elsewhere.
+
+### Health checks
+
+- `https://sub.creepso.com/health` returns `{ "status": "ok" }` and can be used for monitoring.
+- Stremio manifest is available at `https://sub.creepso.com/manifest.json` (or the personalised path that embeds preferences).
+
+### Notes
+
+- The UI automatically embeds your selections into the URL, so the copied HTTP link always reflects the active filters.
+- If you plan to migrate to [wyzie-lib](https://github.com/itzcozi/wyzie-lib) later, the scraper lives in `src/services/libre-subs-scraper.js` and can be swapped without touching the UI or Docker setup.

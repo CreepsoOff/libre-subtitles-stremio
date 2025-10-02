@@ -1,6 +1,6 @@
 # Project Summary - Libre Subtitles Stremio Add-on
 
-## ✅ Current Status
+## ✅ Current Status (end-user ready)
 
 The add-on is fully functional: it scrapes Libre Subs, exposes a configuration-aware subtitles feed, and serves a modern UI for generating installation links.
 
@@ -36,7 +36,7 @@ libre-subtitles-stremio/
    - Deduplication and safe fallbacks (empty array on failure)
 
 3. **Web Configurator (`/`)**
-   - Multi-select language dropdown with strict mode
+   - Multi-select language dropdown with strict mode (copy refined for end users)
    - Toggle chips for formats/sources, hearing-impaired controls
    - Live JSON preview and `stremio://` link generator
    - HTTP link copy helper for remote devices
@@ -80,3 +80,14 @@ All fields are optional. When omitted, the handler returns the full Libre Subs r
 - `IMPLEMENTATION_EXAMPLE.js` – historical examples for advanced scraping patterns
 
 The repository is ready for production use or further customisation. Focus future work on caching, more provider integrations, or UI enhancements if required.
+
+
+## 🐳 Deployment
+
+- `Dockerfile` builds a slim production image (`node:20-alpine`).
+- `docker-compose.yml` ships with Traefik routing for `sub.creepso.com`, HTTPS via Let's Encrypt, and automatic wiring to the add-on container.
+- `TRAEFIK_ACME_EMAIL` must be set before `docker-compose up -d --build`.
+
+## 🔮 Future Work
+
+- Evaluate switching the scraper to [wyzie-lib](https://github.com/itzcozi/wyzie-lib) if the upstream package covers all Libre Subs sources out of the box.

@@ -186,7 +186,7 @@ function updateInstallData() {
 
   configPreview.textContent = configJSON
     ? JSON.stringify(payload, null, 2)
-    : 'No custom preferences. Every language, format and source will be returned.';
+    : 'All subtitles will be offered. Select options above if you want to narrow things down.';
 }
 
 function bindToggles() {

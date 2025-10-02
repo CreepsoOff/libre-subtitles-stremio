@@ -93,3 +93,12 @@ handleSubtitles({
 - Tenir la documentation (`README`, `QUICKSTART`) synchronisée après chaque évolution majeure.
 
 Avec ces informations, vous pouvez facilement ajuster le comportement du scraper, enrichir les filtres ou adapter l’interface selon vos besoins.
+
+
+## Déploiement Docker (sub.creepso.com)
+
+1. Définir `TRAEFIK_ACME_EMAIL` puis lancer `docker-compose up -d --build`.
+2. DNS : créer un enregistrement A pour `sub.creepso.com` vers votre VPS.
+3. Traefik gère automatiquement HTTP→HTTPS et les certificats Let's Encrypt.
+4. La page `https://sub.creepso.com/` sert l'interface utilisateur ; le manifeste se trouve sur `https://sub.creepso.com/manifest.json` (ou le chemin encodé renvoyé par l'interface).
+5. Les préférences choisies dans l'interface sont incluses dans les liens générés.
