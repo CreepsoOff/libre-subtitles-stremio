@@ -151,20 +151,33 @@ Libre Subs is a community service with no official rate limits, but please:
 
 ## Release workflow
 
-1. **Bump the version**
+1. **Prepare the release**
    ```bash
-   npm version 1.1.2
+   npm run release -- --version <new-version>
    ```
-   This updates `package.json`, `package-lock.json`, creates a commit, and tags `v1.1.2`.
-2. **Push**
+   The script verifies that the worktree is clean, updates `package.json`, `package-lock.json`, `version.json`, `version.txt`, commits everything under `chore(release): <new-version>` and recreates the annotated tag `v<new-version>`.
+
+2. **Push and deploy**
    ```bash
    git push origin HEAD --tags
+   docker compose up -d --build
    ```
-3. **Deploy**
-   - `docker-compose up -d --build` (or your CI pipeline).
-   - The server reads the version from `package.json` and the commit hash from Git metadata/env, so the footer will automatically show `UI v… · Add-on v… (hash)` for the deployed commit.
 
-You can override values with environment variables (`ADDON_VERSION`, `ADDON_COMMIT`, `ADDON_COMMIT_SHORT`, `ADDON_COMMIT_URL`) if your deployment pipeline provides them. Otherwise the Node process falls back to the Git metadata bundled in the image.
+3. **Runtime overrides (optional)**
+   If your CI/CD injects environment variables you can override the defaults with `ADDON_VERSION`, `ADDON_COMMIT`, `ADDON_COMMIT_SHORT`, `ADDON_COMMIT_URL`. Otherwise the server uses the version from `package.json` and the commit hash from Git metadata.
+
+### Automated release
+
+```bash
+# bump, commit, tag
+npm run release -- --version <new-version>
+
+# push and deploy
+git push origin HEAD --tags
+docker compose up -d --build
+```
+
+
 
 ## Resources
 
